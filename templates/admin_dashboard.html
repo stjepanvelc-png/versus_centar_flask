@@ -1,39 +1,50 @@
 {% extends "base.html" %}
-{% block title %}Admin Dashboard - Versus Centar{% endblock %}
+{% block title %}Admin Panel - Versus Centar{% endblock %}
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4 text-primary">👑 Admin Panel - Versus Centar</h2>
 
-    <div class="row text-center">
-        <div class="col-md-4">
-            <div class="card shadow-sm p-3 mb-4">
-                <h4 class="text-success">Ukupno Tečajeva</h4>
-                <h2>{{ total_courses }}</h2>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm p-3 mb-4">
-                <h4 class="text-info">Primljene Poruke</h4>
-                <h2>{{ total_messages }}</h2>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm p-3 mb-4">
-                <h4 class="text-warning">Backup</h4>
-                <form action="/admin/backup" method="POST">
-                    <button type="submit" class="btn btn-danger">💾 Napravi Backup</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="text-center mt-4">
-        <a href="/courses" class="btn btn-outline-primary mx-2">📚 Tečajevi</a>
-        <a href="/messages" class="btn btn-outline-info mx-2">✉️ Poruke</a>
-        <a href="/add_course" class="btn btn-outline-success mx-2">➕ Dodaj Tečaj</a>
-        <a href="/logout" class="btn btn-outline-danger mx-2">🚪 Odjava</a>
-    </div>
+<div class="text-center mb-5">
+  <h2 class="text-primary fw-bold">👑 Administracijski Panel</h2>
+  <p class="text-muted">Dobrodošli nazad, administratoru.</p>
+  <hr>
 </div>
+
+<div class="row text-center g-4">
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0 p-3">
+      <h4 class="text-primary">📘 Tečajevi</h4>
+      <p class="lead">{{ broj_kurseva }}</p>
+      <a href="{{ url_for('courses') }}" class="btn btn-outline-primary btn-sm">Uredi</a>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0 p-3">
+      <h4 class="text-success">📅 Događaji</h4>
+      <p class="lead">{{ broj_dogadjaja }}</p>
+      <a href="{{ url_for('events') }}" class="btn btn-outline-success btn-sm">Uredi</a>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0 p-3">
+      <h4 class="text-info">📨 Poruke</h4>
+      <p class="lead">{{ broj_poruka }}</p>
+      <a href="{{ url_for('messages') }}" class="btn btn-outline-info btn-sm">Pregledaj</a>
+    </div>
+  </div>
+</div>
+
+<hr class="my-4">
+
+<div class="text-center mt-3">
+  <form action="{{ url_for('admin_backup') }}" method="POST">
+    <button class="btn btn-warning">💾 Napravi Backup baze</button>
+  </form>
+  <p class="mt-3 text-muted">📂 Zadnji backup: {{ zadnji_backup }}</p>
+</div>
+
+<div class="text-center mt-5">
+  <a href="{{ url_for('admin_logout') }}" class="btn btn-danger">🚪 Odjava</a>
+</div>
+
 {% endblock %}
