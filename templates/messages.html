@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Poruke - Versus Centar{% endblock %}
+{% block content %}
+
+<h2 class="text-center text-primary mb-4">📬 Primljene poruke</h2>
+
+{% if poruke %}
+    <div class="row">
+        {% for p in poruke %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{ p.ime }}</h5>
+                    <h6 class="card-subtitle text-muted mb-2">{{ p.email }}</h6>
+                    <p class="card-text">{{ p.poruka }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info text-center shadow-sm">
+        Nema primljenih poruka.
+    </div>
+{% endif %}
+
+<div class="text-center mt-4">
+    <a href="/logout" class="btn btn-outline-danger">Odjava</a>
+    <a href="/" class="btn btn-outline-secondary">Početna</a>
+</div>
+
+{% endblock %}

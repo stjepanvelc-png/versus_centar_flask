@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Kontakt - Versus Centar{% endblock %}
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h3 class="card-title mb-4 text-center text-primary">Pošaljite nam poruku</h3>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Ime i prezime</label>
+                <input type="text" name="ime" class="form-control" placeholder="Unesite vaše ime" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Email</label>
+                <input type="email" name="email" class="form-control" placeholder="Vaša email adresa" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Poruka</label>
+                <textarea name="poruka" class="form-control" rows="5" placeholder="Napišite svoju poruku..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">📩 Pošalji poruku</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="/" class="btn btn-outline-secondary btn-sm">← Povratak na početnu</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
