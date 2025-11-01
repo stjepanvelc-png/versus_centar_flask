@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - Versus Centar{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4 text-primary">👑 Admin Panel - Versus Centar</h2>
+
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 mb-4">
+                <h4 class="text-success">Ukupno Tečajeva</h4>
+                <h2>{{ total_courses }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 mb-4">
+                <h4 class="text-info">Primljene Poruke</h4>
+                <h2>{{ total_messages }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 mb-4">
+                <h4 class="text-warning">Backup</h4>
+                <form action="/admin/backup" method="POST">
+                    <button type="submit" class="btn btn-danger">💾 Napravi Backup</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/courses" class="btn btn-outline-primary mx-2">📚 Tečajevi</a>
+        <a href="/messages" class="btn btn-outline-info mx-2">✉️ Poruke</a>
+        <a href="/add_course" class="btn btn-outline-success mx-2">➕ Dodaj Tečaj</a>
+        <a href="/logout" class="btn btn-outline-danger mx-2">🚪 Odjava</a>
+    </div>
+</div>
+{% endblock %}

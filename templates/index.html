@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Versus Centar - Uči, Rasti, Uspij{% endblock %}
+{% block content %}
+
+<!-- HERO SEKCIJA -->
+<div class="text-center py-5 bg-light rounded-4 shadow-sm" 
+     style="background: linear-gradient(135deg, #005BAB, #E32726); color: white;">
+    <img src="{{ url_for('static', filename='logo.png.jpg') }}" 
+         alt="Versus Centar logo" 
+         class="mb-4" 
+         style="height: 100px;">
+    <h1 class="fw-bold mb-3">
+        Dobrodošli u <span style="color:#FBB03B;">Versus Centar</span>
+    </h1>
+    <p class="lead mb-4" style="max-width: 600px; margin: 0 auto;">
+        Mjesto gdje znanje postaje tvoja supermoć.  
+        Otkrij jezike, tehnologiju i vještine koje te vode prema boljoj verziji sebe.
+    </p>
+    <a href="{{ url_for('courses') }}" 
+       class="btn btn-warning btn-lg text-dark fw-semibold shadow">
+        🚀 Pogledaj tečajeve
+    </a>
+</div>
+
+<!-- SEKCIJA POVJERENJA -->
+<div class="row mt-5 text-center">
+    <div class="col-md-4 mb-4">
+        <h2 class="text-primary">💡 Inovativno učenje</h2>
+        <p>Koristimo moderne metode i tehnologije koje olakšavaju usvajanje znanja.  
+        Uči svojim tempom, s pravim mentorima.</p>
+    </div>
+    <div class="col-md-4 mb-4">
+        <h2 class="text-danger">🤝 Pristupačni mentori</h2>
+        <p>Naši profesori nisu samo stručnjaci – oni su tvoji vodiči, motivatori i podrška na svakom koraku.</p>
+    </div>
+    <div class="col-md-4 mb-4">
+        <h2 class="text-warning">🌍 Znanje bez granica</h2>
+        <p>Bilo da si učenik, student ili profesionalac, nudimo tečajeve koji ti otvaraju vrata svijeta.</p>
+    </div>
+</div>
+
+<!-- POZIV NA AKCIJU -->
+<div class="text-center mt-5 py-5 bg-white rounded-3 shadow-sm">
+    <h2 class="text-primary fw-bold mb-3">Tvoje znanje. Tvoja budućnost.</h2>
+    <p class="lead mb-4">Počni već danas – svaki veliki put počinje prvim korakom.</p>
+    <a href="{{ url_for('contact') }}" class="btn btn-primary btn-lg fw-semibold shadow">📩 Kontaktiraj nas</a>
+</div>
+
+<!-- LOGIN SEKCIJA -->
+<div class="text-center mt-5">
+    <h4 class="fw-bold mb-3 text-secondary">Pristup sustavu</h4>
+    <div class="d-flex justify-content-center gap-3">
+        <a href="{{ url_for('user_login') }}" 
+           class="btn btn-outline-primary fw-semibold px-4 py-2">
+            👤 Korisnička prijava
+        </a>
+        <a href="{{ url_for('admin_login') }}" 
+           class="btn btn-outline-danger fw-semibold px-4 py-2">
+            🔐 Admin prijava
+        </a>
+    </div>
+</div>
+
+{% endblock %}
