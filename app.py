@@ -51,11 +51,18 @@ class Contact(db.Model):
 def index():
     return render_template("index.html")
 
-# 🔹 Prikaz svih tečajeva
-@app.route("/courses")
-def courses():
-    svi_kursevi = Course.query.all()
-    return render_template("courses.html", courses=svi_kursevi)
+# 🔹 Model za tečajeve
+class Course(db.Model):
+    __tablename__ = 'course'
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    naziv = db.Column(db.String(100), nullable=False)
+    opis = db.Column(db.Text, nullable=True)
+    cijena = db.Column(db.Float, nullable=True)
+
+    def __repr__(self):
+        return f"<Course {self.naziv}>"
 
 # 🔹 Dodavanje novog tečaja
 @app.route("/add_course", methods=["GET", "POST"])
@@ -63,13 +70,59 @@ def add_course():
     if request.method == "POST":
         naziv = request.form["naziv"]
         opis = request.form["opis"]
-        cijena = float(request.form["cijena"])
-        novi = Course(naziv=naziv, opis=opis, cijena=cijena)
-        db.session.add(novi)
-        db.session.commit()
-        flash("Tečaj uspješno dodan!", "success")
-        return redirect(url_for("courses"))
+        cijena = request.form["cijena"]
+
+        try:
+            novi_tecaj = Course(naziv=naziv, opis=opis, cijena=float(cijena))
+            db.session.add(novi_tecaj)
+            db.session.commit()
+            flash("✅ Tečaj je uspješno dodan!", "success")
+            return redirect(url_for("courses"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"⚠️ Greška pri dodavanju tečaja: {e}", "danger")
+
     return render_template("add_course.html")
+
+# Uredi tečaj
+@app.route("/edit_course/<int:id>", methods=["GET", "POST"])
+def edit_course(id):
+    course = Course.query.get_or_404(id)
+
+    if request.method == "POST":
+        course.naziv = request.form["naziv"]
+        course.opis = request.form["opis"]
+        course.cijena = float(request.form["cijena"])
+
+        try:
+            db.session.commit()
+            flash("✅ Tečaj je uspješno ažuriran!", "success")
+            return redirect(url_for("courses"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"⚠️ Greška prilikom ažuriranja: {e}", "danger")
+
+    return render_template("edit_course.html", course=course)
+
+# Brisanje tečaja
+@app.route("/delete_course/<int:id>", methods=["POST"])
+def delete_course(id):
+    course = Course.query.get_or_404(id)
+    try:
+        db.session.delete(course)
+        db.session.commit()
+        flash("❌ Tečaj je uspješno obrisan.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"⚠️ Greška pri brisanju tečaja: {e}", "danger")
+
+    return redirect(url_for("courses"))
+
+# 🔹 Prikaz svih tečajeva
+@app.route("/courses")
+def courses():
+    svi_kursevi = Course.query.all()
+    return render_template("courses.html", courses=svi_kursevi)
 
 # 🔹 Kontakt forma
 @app.route("/contact", methods=["GET", "POST"])
@@ -234,9 +287,4 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     print("🔥 Flask server pokrenut – sve rute aktivne.")
-    app.run(debug=True)
-
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
