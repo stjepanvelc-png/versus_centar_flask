@@ -3,24 +3,31 @@
 {% block content %}
 
 <div class="card shadow-sm border-0">
-    <div class="card-body">
-        <h3 class="text-primary mb-4 text-center">Dodaj novi tečaj</h3>
+  <div class="card-body">
+    <h3 class="text-primary mb-4 text-center">Dodaj novi tečaj</h3>
 
-        <form method="POST">
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Naziv tečaja</label>
-                <input type="text" class="form-control" name="naziv" required placeholder="Unesi naziv tečaja">
-            </div>
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Naziv tečaja</label>
+        <input type="text" class="form-control" name="naziv" required placeholder="Unesi naziv tečaja">
+      </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Opis</label>
-                <textarea name="opis" class="form-control" rows="3" placeholder="Kratak opis tečaja..."></textarea>
-            </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Opis</label>
+        <textarea name="opis" class="form-control" rows="3" placeholder="Kratak opis tečaja..."></textarea>
+      </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Cijena (KM)</label>
-                <input type="number" step="0.01" name="cijena" class="form-control" placeholder="npr. 150.00">
-            </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Cijena (KM)</label>
+        <input type="number" step="0.01" name="cijena" class="form-control" placeholder="npr. 150.00">
+      </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <a href="/courses" class="btn btn-outlin
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <a href="{{ url_for('courses') }}" class="btn btn-outline-secondary">Nazad</a>
+        <button type="submit" class="btn btn-primary">Spremi tečaj</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
