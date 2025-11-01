@@ -67,6 +67,9 @@ class Course(db.Model):
 # 🔹 Dodavanje novog tečaja
 @app.route("/add_course", methods=["GET", "POST"])
 def add_course():
+    if not session.get("admin_logged"):
+        flash("⛔ Pristup dozvoljen samo administratoru.", "danger")
+        return redirect(url_for("admin_login"))
     if request.method == "POST":
         naziv = request.form["naziv"]
         opis = request.form["opis"]
@@ -87,6 +90,9 @@ def add_course():
 # Uredi tečaj
 @app.route("/edit_course/<int:id>", methods=["GET", "POST"])
 def edit_course(id):
+    if not session.get("admin_logged"):
+        flash("⛔ Pristup dozvoljen samo administratoru.", "danger")
+        return redirect(url_for("admin_login"))
     course = Course.query.get_or_404(id)
 
     if request.method == "POST":
@@ -107,6 +113,9 @@ def edit_course(id):
 # Brisanje tečaja
 @app.route("/delete_course/<int:id>", methods=["POST"])
 def delete_course(id):
+    if not session.get("admin_logged"):
+        flash("⛔ Pristup dozvoljen samo administratoru.", "danger")
+        return redirect(url_for("admin_login"))
     course = Course.query.get_or_404(id)
     try:
         db.session.delete(course)
@@ -123,6 +132,104 @@ def delete_course(id):
 def courses():
     svi_kursevi = Course.query.all()
     return render_template("courses.html", courses=svi_kursevi)
+
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    naziv = db.Column(db.String(150), nullable=False)
+    opis = db.Column(db.Text, nullable=True)
+
+# 🔹 Pregled svih događaja
+@app.route("/events")
+def events():
+    svi_dogadjaji = Event.query.all()
+    return render_template("events.html", events=svi_dogadjaji)
+    
+
+# 🔹 Dodavanje događaja (samo admin)
+@app.route("/add_event", methods=["GET", "POST"])
+def add_event():
+    if not session.get("admin_logged"):
+        flash("Pristup dopušten samo administratoru.", "warning")
+        return redirect(url_for("admin_login"))
+
+    if request.method == "POST":
+        naziv = request.form["naziv"]
+        opis = request.form["opis"]
+
+        try:
+            novi = Event(naziv=naziv, opis=opis)
+            db.session.add(novi)
+            db.session.commit()
+            flash("✅ Događaj je uspješno dodan!", "success")
+            return redirect(url_for("events"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"⚠️ Greška pri dodavanju događaja: {e}", "danger")
+
+    return render_template("add_event.html")
+
+# 🔹 Uredi događaj (samo admin)
+@app.route("/edit_event/<int:id>", methods=["GET", "POST"])
+def edit_event(id):
+    if not session.get("admin_logged"):
+        flash("Pristup dopušten samo administratoru.", "warning")
+        return redirect(url_for("admin_login"))
+
+    event = Event.query.get_or_404(id)
+
+    if request.method == "POST":
+        event.naziv = request.form["naziv"]
+        event.opis = request.form["opis"]
+
+        try:
+            db.session.commit()
+            flash("✅ Događaj je uspješno ažuriran!", "success")
+            return redirect(url_for("events"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"⚠️ Greška pri ažuriranju događaja: {e}", "danger")
+
+    return render_template("edit_event.html", event=event)
+
+# 🔹 Prijava na događaj
+@app.route("/register_event/<int:event_id>", methods=["GET", "POST"])
+def register_event(event_id):
+    events = {
+        1: "Python Osnove",
+        2: "Web razvoj Flask"
+    }
+    event_naziv = events.get(event_id, "Nepoznat događaj")
+
+    if request.method == "POST":
+        ime = request.form["ime"]
+        email = request.form["email"]
+        poruka = request.form.get("poruka", "")
+
+        try:
+            nova_prijava = EventRegistration(
+                ime=ime,
+                email=email,
+                event_naziv=event_naziv,
+                poruka=poruka
+            )
+            db.session.add(nova_prijava)
+            db.session.commit()
+
+            # 📬 Pošalji potvrdu e-mailom
+            msg = Message(
+                subject=f"Potvrda prijave za {event_naziv}",
+                recipients=[email],
+                body=f"Hvala {ime}, uspješno ste se prijavili na događaj '{event_naziv}'."
+            )
+            mail.send(msg)
+
+            flash("✅ Uspješno ste se prijavili! Potvrda je poslana e-mailom.", "success")
+            return redirect(url_for("events"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"⚠️ Greška pri prijavi: {e}", "danger")
+
+    return render_template("register_event.html", event_naziv=event_naziv)
 
 # 🔹 Kontakt forma
 @app.route("/contact", methods=["GET", "POST"])
@@ -213,31 +320,30 @@ def test():
 @app.route("/admin/dashboard")
 def admin_dashboard():
     if not session.get("admin_logged"):
+        flash("⛔ Prijavi se kao admin da pristupiš upravljačkoj ploči.", "warning")
         return redirect(url_for("admin_login"))
 
     broj_kurseva = Course.query.count()
     broj_poruka = Contact.query.count()
+    broj_dogadjaja = Event.query.count()
 
-    backup_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "backups")
-    zadnji_backup = None
+    # provjera posljednjeg backup fajla
+    backup_dir = "backup"
+    zadnji_backup = "Nema dostupnih kopija."
     if os.path.exists(backup_dir):
-        backup_fajlovi = sorted(
-            [f for f in os.listdir(backup_dir) if f.endswith(".db")],
-            key=lambda x: os.path.getmtime(os.path.join(backup_dir, x)),
-            reverse=True
-        )
-        if backup_fajlovi:
-            zadnji_backup = datetime.fromtimestamp(
-                os.path.getmtime(os.path.join(backup_dir, backup_fajlovi[0]))
-            ).strftime("%d.%m.%Y %H:%M")
+        fajlovi = sorted(os.listdir(backup_dir), reverse=True)
+        if fajlovi:
+            zadnji_backup = fajlovi[0]
 
     return render_template(
         "admin_dashboard.html",
         broj_kurseva=broj_kurseva,
         broj_poruka=broj_poruka,
+        broj_dogadjaja=broj_dogadjaja,
         zadnji_backup=zadnji_backup
     )
-    
+
+# 🔹 Pregled poruka (za admina)    
 @app.route("/messages")
 def messages():
     if not session.get("admin_logged"):
@@ -281,6 +387,36 @@ def require_login():
     if request.path.startswith("/user") and not request.path.startswith("/user/login"):
         if not session.get("logged_in"):
             return redirect(url_for("user_login"))
+        
+# 📅 Model za prijave na događaje
+class EventRegistration(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ime = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    event_naziv = db.Column(db.String(150), nullable=False)
+    poruka = db.Column(db.Text)
+    datum_prijave = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Prijava {self.ime} za {self.event_naziv}>"
+    
+# 🔹 Brisanje događaja
+@app.route("/delete_event/<int:id>", methods=["POST"])
+def delete_event(id):
+    if not session.get("admin_logged"):
+        flash("❌ Pristup odbijen! Samo admin može brisati događaje.", "danger")
+        return redirect(url_for("events"))
+
+    try:
+        event = Event.query.get_or_404(id)
+        db.session.delete(event)
+        db.session.commit()
+        flash("✅ Događaj uspješno obrisan!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"⚠️ Greška pri brisanju događaja: {e}", "danger")
+
+    return redirect(url_for("events"))
 
 # 🔹 Pokretanje aplikacije
 if __name__ == "__main__":

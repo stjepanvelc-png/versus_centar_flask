@@ -97,11 +97,19 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Početna</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('courses') }}">Tečajevi</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Kontakt</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('user_login') }}">Prijava</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_login') }}">Admin</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Početna</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('courses') }}">Tečajevi</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('events') }}">Događaji</a></li>
+
+                {% if session.get('admin_logged') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('add_event') }}">➕ Dodaj događaj</a>
+                    </li>
+                {% endif %}
+
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Kontakt</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('user_login') }}">Prijava</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_login') }}">Admin</a></li>
                 </ul>
             </div>
         </div>
@@ -109,6 +117,13 @@
 
     <!-- Glavni sadržaj -->
     <div class="container mt-5">
+        {% if session.get('admin_logged') %}
+        <div class="alert alert-info text-center shadow-sm mb-4">
+            👑 Prijavljeni ste kao <strong>Admin</strong> — 
+            <a href="{{ url_for('admin_dashboard') }}" class="alert-link">Otvorite admin panel</a> |
+            <a href="{{ url_for('admin_logout') }}" class="alert-link text-danger">Odjava</a>
+        </div>
+        {% endif %}
         {% block content %}{% endblock %}
     </div>
 
