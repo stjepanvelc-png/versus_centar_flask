@@ -93,7 +93,7 @@ def add_course():
             db.session.commit()
 
             # 💾 Tek sad napravi backup jer je baza ažurirana
-            from auto_backup import backup_database
+            from utils import backup_database
             backup_database()
 
             flash("✅ Tečaj je uspješno dodan i backup je napravljen!", "success")
