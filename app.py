@@ -6,6 +6,8 @@ from datetime import datetime
 import os
 import shutil
 
+from utils import auto_backup
+
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
@@ -23,6 +25,12 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # 🔹 Inicijalizacija baze
 db = SQLAlchemy(app)
+
+# 🔹 Automatsko kreiranje baze ako ne postoji
+if not os.path.exists(os.path.join(basedir, 'versus.db')):
+    with app.app_context():
+        db.create_all()
+        print("✅ Kreirana nova baza podataka (versus.db)")
 
 # 🔹 E-mail konfiguracija
 app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
@@ -79,6 +87,7 @@ def add_course():
             novi_tecaj = Course(naziv=naziv, opis=opis, cijena=float(cijena))
             db.session.add(novi_tecaj)
             db.session.commit()
+            auto_backup()
             flash("✅ Tečaj je uspješno dodan!", "success")
             return redirect(url_for("courses"))
         except Exception as e:
