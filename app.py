@@ -316,6 +316,49 @@ def admin_logout():
 def test():
     return "Radi ✅"
 
+@app.route("/snaga_uma")
+def snaga_uma():
+    return render_template("snaga_uma.html")
+
+@app.route("/kontakt_snaga_uma", methods=["POST"])
+def kontakt_snaga_uma():
+    try:
+        ime = request.form["ime"]
+        email = request.form["email"]
+        poruka = request.form["poruka"]
+
+        # 📩 Poruka ide njoj
+        msg_to_admin = Message(
+            subject=f"Nova poruka za Snaga Uma - {ime}",
+            sender=email,
+            recipients=["snaguma17@gmail.com"],
+            body=f"Ime: {ime}\nE-mail: {email}\n\nPoruka:\n{poruka}"
+        )
+        mail.send(msg_to_admin)
+
+        # 📤 Auto-odgovor pošiljatelju
+        auto_reply = Message(
+            subject="Hvala na kontaktu - Snaga Uma",
+            sender="snaguma17@gmail.com",
+            recipients=[email],
+            body=f"""
+Poštovani {ime},
+
+Hvala vam što ste nas kontaktirali! 🌿 
+Vaša poruka je primljena i tim Snaga Uma će vam se javiti u najkraćem mogućem roku.
+
+Lijep pozdrav,  
+Snaga Uma – Partnersko savjetovanje
+"""
+        )
+        mail.send(auto_reply)
+
+        flash("✅ Poruka je uspješno poslana! Primiti ćete potvrdu putem e-maila.", "success")
+    except Exception as e:
+        flash(f"⚠️ Greška pri slanju poruke: {e}", "danger")
+
+    return redirect(url_for("snaga_uma"))
+
 # 🔹 Admin dashboard (jedina verzija!)
 @app.route("/admin/dashboard")
 def admin_dashboard():

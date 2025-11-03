@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Snaga Uma – Partnersko savjetovanje{% endblock %}
+{% block content %}
+
+<div class="card shadow-sm border-0 mx-auto" style="max-width: 800px;">
+  <div class="card-body text-center">
+    <img src="{{ url_for('static', filename='snaga_uma_banner.jpg.png') }}" 
+         alt="Snaga Uma banner" class="img-fluid rounded mb-4 shadow-sm">
+
+    <h3 class="text-primary mb-3">🧠 Snaga Uma – Partnersko savjetovanje</h3>
+    <p class="lead">Savjetovanje se provodi kroz ukupno <strong>5 seansi</strong>:</p>
+
+    <ul class="list-group list-group-flush text-start mb-4">
+      <li class="list-group-item">💬 1. seansa – zajednički rad s oba partnera (90 min)</li>
+      <li class="list-group-item">🧍‍♂️🧍‍♀️ 2. seansa – pojedinačni rad (45 min po partneru)</li>
+      <li class="list-group-item">💞 3–5. seansa – zajedničke seanse (60 min)</li>
+    </ul>
+
+    <p>
+      Konzultacije su moguće <strong>uživo</strong> ili <strong>online</strong>, ovisno o vašim potrebama.
+    </p>
+
+    <div class="mt-4">
+      <a href="mailto:snaguma17@gmail.com" class="btn btn-danger btn-sm me-2">
+        📩 Kontaktiraj nas putem e-maila
+      </a>
+      <a href="https://www.instagram.com/savjetovanje_snaga_uma" target="_blank" class="btn btn-outline-primary btn-sm">
+        📱 Posjeti Instagram profil
+      </a>
+    </div>
+  </div>
+</div>
+
+<hr class="my-5">
+
+<h4 class="text-center text-primary">📬 Pošaljite poruku direktno putem obrasca</h4>
+<p class="text-center text-muted mb-4">Vaš upit stiže direktno timu <strong>Snaga Uma</strong>.</p>
+
+<form method="POST" action="{{ url_for('kontakt_snaga_uma') }}" class="card p-4 shadow-sm mx-auto" style="max-width: 500px;">
+  <div class="mb-3">
+    <label class="form-label">Ime i prezime</label>
+    <input type="text" name="ime" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">E-mail adresa</label>
+    <input type="email" name="email" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Poruka</label>
+    <textarea name="poruka" class="form-control" rows="3" placeholder="Vaša poruka..."></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-primary w-100">📨 Pošalji poruku</button>
+</form>
+
+{% endblock %}
