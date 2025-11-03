@@ -78,21 +78,31 @@ def add_course():
     if not session.get("admin_logged"):
         flash("⛔ Pristup dozvoljen samo administratoru.", "danger")
         return redirect(url_for("admin_login"))
+
     if request.method == "POST":
         naziv = request.form["naziv"]
         opis = request.form["opis"]
         cijena = request.form["cijena"]
 
         try:
+            # ➕ Kreiraj novi tečaj
             novi_tecaj = Course(naziv=naziv, opis=opis, cijena=float(cijena))
             db.session.add(novi_tecaj)
+
+            # ✅ Prvo spremi u bazu
             db.session.commit()
-            auto_backup()
-            flash("✅ Tečaj je uspješno dodan!", "success")
+
+            # 💾 Tek sad napravi backup jer je baza ažurirana
+            from auto_backup import backup_database
+            backup_database()
+
+            flash("✅ Tečaj je uspješno dodan i backup je napravljen!", "success")
             return redirect(url_for("courses"))
+
         except Exception as e:
             db.session.rollback()
             flash(f"⚠️ Greška pri dodavanju tečaja: {e}", "danger")
+            return redirect(url_for("add_course"))
 
     return render_template("add_course.html")
 
@@ -406,19 +416,7 @@ def messages():
     return render_template("messages.html", poruke=sve_poruke)
 
 # 🔹 Backup funkcija
-@app.route("/admin/backup", methods=["POST"])
-def admin_backup():
-    if not session.get("admin_logged"):
-        return redirect(url_for("admin_login"))
-
-    try:
-        from auto_backup import backup_database
-        backup_database()
-        flash("✅ Backup baze je uspješno napravljen i pohranjen!", "success")
-    except Exception as e:
-        flash(f"⚠️ Greška pri izradi backupa: {e}", "danger")
-
-    return redirect(url_for("admin_dashboard"))
+from utils import auto_backup
 
 # 🔹 Odjava (za oba tipa korisnika)
 @app.route("/logout")
